@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Geography & English Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Pacifico&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --pink: #FF6B9D;
+    --pink-light: #FFB3D1;
+    --pink-pale: #FFF0F6;
+    --teal: #00C9B1;
+    --teal-light: #B3F0E9;
+    --sky: #74C4FF;
+    --sky-light: #DCEFFE;
+    --lavender: #C9B3FF;
+    --lavender-light: #EDE8FF;
+    --yellow: #FFD95A;
+    --yellow-light: #FFF5CC;
+    --bg: #FFF7FB;
+    --text: #3A2050;
+    --text-soft: #9B7EB5;
+    --white: #FFFFFF;
+    --shadow: 0 4px 20px rgba(255,107,157,0.15);
+    --shadow-card: 0 8px 32px rgba(58,32,80,0.10);
+  }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='6' fill='%23FF6B9D' opacity='0.7'/%3E%3C/svg%3E") 12 12, auto;
+  }
+
+  /* Floating stars background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(circle at 10% 15%, #FFD95A22 0%, transparent 40%),
+      radial-gradient(circle at 85% 10%, #FF6B9D18 0%, transparent 35%),
+      radial-gradient(circle at 70% 80%, #00C9B115 0%, transparent 40%),
+      radial-gradient(circle at 20% 80%, #C9B3FF18 0%, transparent 35%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .stars {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+  .star {
+    position: absolute;
+    border-radius: 50%;
+    animation: float linear infinite;
+    opacity: 0.5;
+  }
+
+  @keyframes float {
+    0% { transform: translateY(110vh) rotate(0deg); opacity: 0; }
+    10% { opacity: 0.6; }
+    90% { opacity: 0.4; }
+    100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 2rem 1rem 4rem;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    animation: slideDown 0.6s cubic-bezier(.34,1.56,.64,1) both;
+  }
+
+  @keyframes slideDown {
+    from { transform: translateY(-30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  .header h1 {
+    font-family: 'Pacifico', cursive;
+    font-size: 2.2rem;
+    color: var(--pink);
+    text-shadow: 3px 3px 0 #FFB3D1, 5px 5px 0 #FFD0E8;
+    margin-bottom: 0.4rem;
+    line-height: 1.2;
+  }
+
+  .header p {
+    font-size: 1rem;
+    color: var(--text-soft);
+    font-weight: 600;
+  }
+
+  .globe {
+    display: inline-block;
+    font-size: 2.4rem;
+    animation: spin 8s linear infinite;
+  }
+
+  @keyframes spin {
+    0%,100% { transform: rotate(-5deg) scale(1); }
+    50% { transform: rotate(5deg) scale(1.1); }
+  }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 1.8rem;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+    animation: slideUp 0.6s 0.2s cubic-bezier(.34,1.56,.64,1) both;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+
+  @keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  .tab {
+    flex-shrink: 0;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 50px;
+    font-size: 0.88rem;
+    font-weight: 800;
+    font-family: 'Nunito', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(.34,1.56,.64,1);
+    background: var(--white);
+    color: var(--text-soft);
+    box-shadow: 0 2px 10px rgba(58,32,80,0.08);
+    letter-spacing: 0.01em;
+  }
+
+  .tab:hover { transform: translateY(-2px); }
+
+  .tab.active[data-tab="wh"] { background: var(--pink); color: white; box-shadow: 0 4px 16px rgba(255,107,157,0.4); }
+  .tab.active[data-tab="pronouns"] { background: var(--lavender); color: white; box-shadow: 0 4px 16px rgba(201,179,255,0.5); }
+  .tab.active[data-tab="be"] { background: var(--teal); color: white; box-shadow: 0 4px 16px rgba(0,201,177,0.4); }
+  .tab.active[data-tab="geo"] { background: #FF9F5A; color: white; box-shadow: 0 4px 16px rgba(255,159,90,0.4); }
+
+  /* Sections */
+  .section { display: none; }
+  .section.active { display: block; animation: popIn 0.4s cubic-bezier(.34,1.56,.64,1) both; }
+
+  @keyframes popIn {
+    from { transform: scale(0.95); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  /* Progress bar */
+  .progress-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 1.2rem;
+  }
+
+  .progress-bar-bg {
+    flex: 1;
+    height: 10px;
+    background: var(--pink-pale);
+    border-radius: 50px;
+    overflow: hidden;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    border-radius: 50px;
+    transition: width 0.4s ease;
+    background: linear-gradient(90deg, var(--pink), var(--pink-light));
+  }
+
+  .progress-fill-lavender { background: linear-gradient(90deg, var(--lavender), #DDD0FF); }
+  .progress-fill-teal { background: linear-gradient(90deg, var(--teal), var(--teal-light)); }
+  .progress-fill-orange { background: linear-gradient(90deg, #FF9F5A, #FFCBA4); }
+
+  .progress-label {
+    font-size: 0.82rem;
+    font-weight: 800;
+    color: var(--text-soft);
+    white-space: nowrap;
+    min-width: 56px;
+    text-align: right;
+  }
+
+  /* Score stars */
+  .score-stars {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 1.2rem;
+  }
+
+  .score-star {
+    font-size: 1.2rem;
+    transition: transform 0.3s cubic-bezier(.34,1.56,.64,1);
+  }
+
+  .score-star.lit { animation: starPop 0.4s cubic-bezier(.34,1.56,.64,1); }
+
+  @keyframes starPop {
+    from { transform: scale(0) rotate(-20deg); }
+    to { transform: scale(1) rotate(0); }
+  }
+
+  /* Question card */
+  .question-card {
+    background: var(--white);
+    border-radius: 24px;
+    padding: 1.8rem;
+    box-shadow: var(--shadow-card);
+    margin-bottom: 1.2rem;
+    border: 2px solid transparent;
+    transition: border-color 0.3s;
+  }
+
+  .q-category {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 50px;
+    margin-bottom: 12px;
+  }
+
+  .cat-pink { background: var(--pink-pale); color: var(--pink); }
+  .cat-lavender { background: var(--lavender-light); color: #7B5FCC; }
+  .cat-teal { background: var(--teal-light); color: #007A6C; }
+  .cat-orange { background: #FFF0E6; color: #CC6630; }
+
+  .q-text {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--text);
+    margin-bottom: 1.2rem;
+    line-height: 1.4;
+  }
+
+  .blank {
+    display: inline-block;
+    min-width: 80px;
+    border-bottom: 3px dashed var(--pink-light);
+    color: var(--pink);
+    font-style: italic;
+    padding: 0 6px;
+  }
+
+  .hint-box {
+    background: var(--yellow-light);
+    border-radius: 12px;
+    padding: 8px 14px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #AA7A00;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* Options */
+  .options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .opt {
+    padding: 12px 16px;
+    border: 2px solid #EEE5F5;
+    border-radius: 16px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    font-family: 'Nunito', sans-serif;
+    cursor: pointer;
+    background: var(--white);
+    color: var(--text);
+    text-align: center;
+    transition: all 0.15s cubic-bezier(.34,1.56,.64,1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .opt:hover:not(:disabled) {
+    border-color: var(--pink-light);
+    background: var(--pink-pale);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 14px rgba(255,107,157,0.18);
+  }
+
+  .opt.correct {
+    background: #EAFAF6;
+    border-color: var(--teal);
+    color: #007A6C;
+    animation: correctPop 0.4s cubic-bezier(.34,1.56,.64,1);
+  }
+
+  @keyframes correctPop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.06); }
+    100% { transform: scale(1); }
+  }
+
+  .opt.wrong {
+    background: #FFF0F3;
+    border-color: #FF8FAF;
+    color: #CC2255;
+  }
+
+  .opt:disabled { cursor: default; }
+
+  /* Feedback */
+  .feedback {
+    margin-top: 14px;
+    padding: 12px 16px;
+    border-radius: 14px;
+    font-size: 0.95rem;
+    font-weight: 800;
+    display: none;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .feedback.show { display: flex; animation: popIn 0.3s cubic-bezier(.34,1.56,.64,1) both; }
+  .feedback.ok { background: #EAFAF6; color: #007A6C; }
+  .feedback.no { background: #FFF0F3; color: #CC2255; }
+
+  /* Next button */
+  .btn-next {
+    display: none;
+    margin-top: 1rem;
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 900;
+    font-family: 'Nunito', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(.34,1.56,.64,1);
+    color: white;
+    letter-spacing: 0.02em;
+  }
+
+  .btn-next.show { display: block; animation: popIn 0.3s cubic-bezier(.34,1.56,.64,1) both; }
+  .btn-next:hover { transform: translateY(-3px); filter: brightness(1.08); }
+  .btn-next:active { transform: translateY(0) scale(0.98); }
+
+  .btn-pink { background: linear-gradient(135deg, var(--pink), #FF4F8E); box-shadow: 0 6px 20px rgba(255,107,157,0.4); }
+  .btn-lavender { background: linear-gradient(135deg, #A78BFF, var(--lavender)); box-shadow: 0 6px 20px rgba(167,139,255,0.4); }
+  .btn-teal { background: linear-gradient(135deg, var(--teal), #00A891); box-shadow: 0 6px 20px rgba(0,201,177,0.4); }
+  .btn-orange { background: linear-gradient(135deg, #FF9F5A, #FF7730); box-shadow: 0 6px 20px rgba(255,159,90,0.4); }
+
+  /* Score screen */
+  .score-screen {
+    background: var(--white);
+    border-radius: 28px;
+    padding: 2.5rem 2rem;
+    text-align: center;
+    box-shadow: var(--shadow-card);
+    animation: popIn 0.5s cubic-bezier(.34,1.56,.64,1) both;
+  }
+
+  .score-emoji { font-size: 4rem; margin-bottom: 0.5rem; animation: bounce 0.8s cubic-bezier(.34,1.56,.64,1) both; }
+
+  @keyframes bounce {
+    0% { transform: scale(0) rotate(-10deg); }
+    60% { transform: scale(1.2) rotate(5deg); }
+    100% { transform: scale(1) rotate(0deg); }
+  }
+
+  .score-title {
+    font-family: 'Pacifico', cursive;
+    font-size: 1.6rem;
+    color: var(--pink);
+    margin-bottom: 0.5rem;
+  }
+
+  .score-number {
+    font-size: 3.5rem;
+    font-weight: 900;
+    color: var(--text);
+    line-height: 1;
+    margin: 0.5rem 0;
+  }
+
+  .score-msg {
+    font-size: 1rem;
+    color: var(--text-soft);
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+  }
+
+  .btn-restart {
+    display: inline-block;
+    padding: 14px 36px;
+    border: none;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 900;
+    font-family: 'Nunito', sans-serif;
+    cursor: pointer;
+    background: linear-gradient(135deg, var(--pink), #FF4F8E);
+    color: white;
+    box-shadow: 0 6px 20px rgba(255,107,157,0.4);
+    transition: all 0.2s cubic-bezier(.34,1.56,.64,1);
+  }
+  .btn-restart:hover { transform: translateY(-3px); }
+
+  /* Pronouns table section */
+  .pronoun-overview {
+    background: var(--white);
+    border-radius: 24px;
+    padding: 1.8rem;
+    box-shadow: var(--shadow-card);
+    margin-bottom: 1.2rem;
+  }
+
+  .pronoun-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 6px;
+    margin: 1rem 0;
+  }
+
+  .pronoun-header {
+    font-size: 0.75rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 8px;
+    text-align: center;
+    border-radius: 10px 10px 0 0;
+    color: white;
+  }
+
+  .ph-pink { background: var(--pink); }
+  .ph-lavender { background: #A78BFF; }
+  .ph-teal { background: var(--teal); }
+
+  .pronoun-cell {
+    padding: 10px;
+    text-align: center;
+    font-weight: 800;
+    font-size: 1rem;
+    border-radius: 10px;
+    transition: transform 0.15s;
+    cursor: default;
+  }
+
+  .pronoun-cell:hover { transform: scale(1.08); }
+
+  .pc-pink { background: var(--pink-pale); color: var(--pink); }
+  .pc-lavender { background: var(--lavender-light); color: #7B5FCC; }
+  .pc-teal { background: var(--teal-light); color: #007A6C; }
+
+  .switch-mode-btn {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 900;
+    font-family: 'Nunito', sans-serif;
+    cursor: pointer;
+    background: linear-gradient(135deg, #A78BFF, var(--lavender));
+    color: white;
+    box-shadow: 0 6px 20px rgba(167,139,255,0.4);
+    transition: all 0.2s cubic-bezier(.34,1.56,.64,1);
+    margin-top: 1rem;
+  }
+
+  .switch-mode-btn:hover { transform: translateY(-3px); }
+
+  /* Fill input */
+  .fill-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #EEE5F5;
+    border-radius: 14px;
+    font-size: 1rem;
+    font-weight: 700;
+    font-family: 'Nunito', sans-serif;
+    color: var(--text);
+    background: var(--bg);
+    outline: none;
+    transition: border-color 0.2s;
+    margin-bottom: 12px;
+  }
+
+  .fill-input:focus { border-color: var(--lavender); background: var(--lavender-light); }
+
+  .btn-check {
+    display: block;
+    width: 100%;
+    padding: 13px;
+    border: none;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 900;
+    font-family: 'Nunito', sans-serif;
+    cursor: pointer;
+    background: linear-gradient(135deg, #A78BFF, var(--lavender));
+    color: white;
+    box-shadow: 0 6px 20px rgba(167,139,255,0.4);
+    transition: all 0.2s cubic-bezier(.34,1.56,.64,1);
+    margin-bottom: 8px;
+  }
+
+  .btn-check:hover { transform: translateY(-2px); }
+
+  /* confetti */
+  .confetti-piece {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    animation: confettiFall 1.5s ease-in forwards;
+    z-index: 999;
+    pointer-events: none;
+  }
+
+  @keyframes confettiFall {
+    0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+  }
+
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 800;
+    font-family: 'Nunito', sans-serif;
+    cursor: pointer;
+    background: var(--lavender-light);
+    color: #7B5FCC;
+    margin-bottom: 1rem;
+    transition: all 0.2s;
+  }
+
+  .back-btn:hover { background: var(--lavender); color: white; transform: translateX(-3px); }
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<div class="container">
+  <div class="header">
+    <div class="globe">🌍</div>
+    <h1>World Explorer Quiz</h1>
+    <p>Geography &amp; English · procvičuj se mnou!</p>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="wh" onclick="showTab('wh',this)">🌟 Wh- questions</button>
+    <button class="tab" data-tab="pronouns" onclick="showTab('pronouns',this)">💜 Pronouns</button>
+    <button class="tab" data-tab="be" onclick="showTab('be',this)">🌊 Verb to be</button>
+    <button class="tab" data-tab="geo" onclick="showTab('geo',this)">🗺️ Geography</button>
+  </div>
+
+  <div class="section active" id="tab-wh"></div>
+  <div class="section" id="tab-pronouns"></div>
+  <div class="section" id="tab-be"></div>
+  <div class="section" id="tab-geo"></div>
+</div>
+
+<script>
+const COLORS = {
+  wh: { cat: 'cat-pink', bar: '', btn: 'btn-pink', label: 'Doplň tázací slovo' },
+  pronouns: { cat: 'cat-lavender', bar: 'progress-fill-lavender', btn: 'btn-lavender', label: 'Doplň zájmeno' },
+  be: { cat: 'cat-teal', bar: 'progress-fill-teal', btn: 'btn-teal', label: 'Doplň tvar slovesa být' },
+  geo: { cat: 'cat-orange', bar: 'progress-fill-orange', btn: 'btn-orange', label: 'Odpověz na otázku' },
+};
+
+const whData = [
+  { q: '_____ is the Nile River?', answer: 'Where', options: ['Where','What','Who','When'], hint: 'ptáme se na místo' },
+  { q: '_____ are the Himalayas?', answer: 'Where', options: ['Where','Which','What','Why'], hint: 'ptáme se na místo' },
+  { q: '_____ ocean is next to four continents?', answer: 'Which', options: ['Which','Where','What','How'], hint: 'ptáme se na výběr z více možností' },
+  { q: '_____ continent is cold?', answer: 'Which', options: ['Which','Where','Who','What'], hint: 'ptáme se na výběr z kontinentů' },
+  { q: '_____ continent is your country in?', answer: 'Which', options: ['Which','Where','What','When'], hint: 'ptáme se na výběr + místo' },
+  { q: '_____ is between Europe and Oceania?', answer: 'What', options: ['What','Which','Who','Where'], hint: 'ptáme se na věc' },
+  { q: '_____ is your name?', answer: 'What', options: ['What','Who','Where','Which'], hint: 'ptáme se na jméno / informaci' },
+  { q: '_____ is the capital of France?', answer: 'What', options: ['What','Which','Where','Who'], hint: 'ptáme se na konkrétní jméno' },
+];
+
+const beData = [
+  { q: 'The Indian Ocean _____ between Africa and Oceania.', answer: 'is', options: ['is','are','am','be'], hint: 'The Indian Ocean = jednotné číslo' },
+  { q: 'North America and South America _____ between two oceans.', answer: 'are', options: ['are','is','am','be'], hint: 'Two continents = množné číslo' },
+  { q: 'I _____ a geography student.', answer: 'am', options: ['am','is','are','be'], hint: 'I vždy → am' },
+  { q: 'The Himalayas _____ in Asia.', answer: 'are', options: ['are','is','am','be'], hint: 'mountains = množné číslo' },
+  { q: 'Where _____ the Sahara Desert?', answer: 'is', options: ['is','are','am','be'], hint: 'desert = jednotné číslo' },
+  { q: 'Which continent _____ cold?', answer: 'is', options: ['is','are','am','be'], hint: 'continent = jednotné číslo' },
+  { q: 'We _____ students.', answer: 'are', options: ['are','is','am','be'], hint: 'We → are' },
+  { q: 'The Rocky Mountains _____ in North America.', answer: 'are', options: ['are','is','am','be'], hint: 'mountains = množné číslo' },
+  { q: '_____ you from Europe?', answer: 'Are', options: ['Are','Is','Am','Be'], hint: 'You → are' },
+  { q: 'It _____ next to the Indian Ocean.', answer: 'is', options: ['is','are','am','be'], hint: 'It → is' },
+];
+
+const geoData = [
+  { q: "Where's the Nile River?", answer: 'Africa', options: ['Africa','Asia','Europe','South America'] },
+  { q: 'Where are the Himalayas?', answer: 'Asia', options: ['Asia','Africa','Europe','Oceania'] },
+  { q: "Where's the Sahara Desert?", answer: 'Africa', options: ['Africa','Asia','North America','South America'] },
+  { q: 'Where are the Rocky Mountains?', answer: 'North America', options: ['North America','South America','Europe','Asia'] },
+  { q: "Where's the Amazon River?", answer: 'South America', options: ['South America','Africa','Asia','North America'] },
+  { q: 'Which ocean is next to four continents?', answer: 'Atlantic Ocean', options: ['Atlantic Ocean','Pacific Ocean','Indian Ocean','Arctic Ocean'] },
+  { q: 'Which continent is cold?', answer: 'Antarctica', options: ['Antarctica','Oceania','Africa','Asia'] },
+];
+
+const pronounPairs = [
+  { subject: 'I', object: 'me', possessive: 'my' },
+  { subject: 'you', object: 'you', possessive: 'your' },
+  { subject: 'he', object: 'him', possessive: 'his' },
+  { subject: 'she', object: 'her', possessive: 'her' },
+  { subject: 'it', object: 'it', possessive: 'its' },
+  { subject: 'we', object: 'us', possessive: 'our' },
+  { subject: 'they', object: 'them', possessive: 'their' },
+];
+
+const pronounFill = [
+  { q: '_____ am from Prague.', answer: 'I', hint: '1st person singular' },
+  { q: '_____ is between Africa and Oceania.', answer: 'It', hint: 'pro věci a místa' },
+  { q: '_____ are my classmates.', answer: 'They', hint: '3rd person plural' },
+  { q: 'Africa is big. _____ has many countries.', answer: 'It', hint: 'nahrazuješ slovo "Africa"' },
+  { q: 'Tom and I are friends. _____ go to school together.', answer: 'We', hint: '1st person plural' },
+  { q: 'Anna is from Slovakia. _____ speaks Slovak.', answer: 'She', hint: '3rd person singular, female' },
+  { q: 'This is my book. Can you give it to _____?', answer: 'me', hint: 'object form of I' },
+];
+
+const states = {};
+
+function initQuiz(id, data, type) {
+  states[id] = { current: 0, score: 0, answered: false };
+  renderQuiz(id, data, type);
+}
+
+function renderQuiz(id, data, type) {
+  const s = states[id];
+  const c = COLORS[type];
+  const el = document.getElementById('tab-' + type);
+  if (s.current >= data.length) { renderScore(el, s, data, type); return; }
+  const item = data[s.current];
+  const pct = Math.round((s.current / data.length) * 100);
+  const stars = Array.from({length: data.length}, (_,i) =>
+    `<span class="score-star" id="star-${type}-${i}">${i < s.score ? '⭐' : '☆'}</span>`
+  ).join('');
+
+  const qDisplay = item.q.replace('_____', `<span class="blank">?</span>`);
+  const opts = item.options.map(o =>
+    `<button class="opt" onclick="checkAns(this,'${o}','${item.answer}','${type}')"> ${o}</button>`
+  ).join('');
+  const hintHtml = item.hint ? `<div class="hint-box">💡 ${item.hint}</div>` : '';
+
+  el.innerHTML = `
+    <div class="progress-wrap">
+      <div class="progress-bar-bg"><div class="progress-bar-fill ${c.bar}" style="width:${pct}%"></div></div>
+      <div class="progress-label">${s.current}/${data.length}</div>
+    </div>
+    <div class="score-stars">${stars}</div>
+    <div class="question-card">
+      <div class="q-category ${c.cat}">${c.label}</div>
+      <div class="q-text">${qDisplay}</div>
+      ${hintHtml}
+      <div class="options">${opts}</div>
+      <div class="feedback" id="fb-${type}"></div>
+    </div>
+    <button class="btn-next ${c.btn}" id="next-${type}" onclick="nextQ('${type}')">Další →</button>
+  `;
+  s.answered = false;
+}
+
+function checkAns(btn, selected, correct, type) {
+  const s = states[type];
+  if (s.answered) return;
+  s.answered = true;
+  const opts = btn.parentElement.querySelectorAll('.opt');
+  opts.forEach(o => { o.disabled = true; if (o.textContent.trim() === correct) o.classList.add('correct'); });
+  const fb = document.getElementById('fb-' + type);
+  if (selected === correct) {
+    btn.classList.add('correct');
+    s.score++;
+    fb.innerHTML = '✅ Super! Správně!';
+    fb.className = 'feedback show ok';
+    updateStar(type, s.score - 1);
+    if (s.score === (type === 'wh' ? whData : type === 'be' ? beData : geoData).length) confetti();
+  } else {
+    btn.classList.add('wrong');
+    fb.innerHTML = `❌ Správná odpověď: <strong>${correct}</strong>`;
+    fb.className = 'feedback show no';
+  }
+  document.getElementById('next-' + type).classList.add('show');
+}
+
+function updateStar(type, idx) {
+  const star = document.getElementById(`star-${type}-${idx}`);
+  if (star) { star.textContent = '⭐'; star.classList.add('lit'); }
+}
+
+function nextQ(type) {
+  const s = states[type];
+  s.current++;
+  s.answered = false;
+  const data = type === 'wh' ? whData : type === 'be' ? beData : geoData;
+  renderQuiz(type, data, type);
+}
+
+function renderScore(el, s, data, type) {
+  const pct = Math.round(s.score / data.length * 100);
+  const emoji = pct === 100 ? '🏆' : pct >= 70 ? '🎉' : pct >= 40 ? '😊' : '💪';
+  const msg = pct === 100 ? 'Naprostá jednička! Jsi hvězda!' : pct >= 70 ? 'Skvělá práce! Skoro perfektní!' : pct >= 40 ? 'Dobrý začátek, zkus to znovu!' : 'Nevzdávej to, zkus to ještě jednou!';
+  el.innerHTML = `<div class="score-screen">
+    <div class="score-emoji">${emoji}</div>
+    <div class="score-title">Hotovo!</div>
+    <div class="score-number">${s.score}/${data.length}</div>
+    <div class="score-msg">${msg}</div>
+    ${pct === 100 ? '<div style="font-size:2rem;margin-bottom:1rem">⭐⭐⭐</div>' : ''}
+    <button class="btn-restart" onclick="restartQuiz('${type}')">Zkusit znovu 🔄</button>
+  </div>`;
+  if (pct === 100) confetti();
+}
+
+function restartQuiz(type) {
+  const data = type === 'wh' ? whData : type === 'be' ? beData : geoData;
+  states[type] = { current: 0, score: 0, answered: false };
+  renderQuiz(type, data, type);
+}
+
+// PRONOUNS SECTION
+function renderPronounsTable() {
+  const el = document.getElementById('tab-pronouns');
+  const rows = pronounPairs.map(p => `
+    <div class="pronoun-cell pc-pink">${p.subject}</div>
+    <div class="pronoun-cell pc-lavender">${p.object}</div>
+    <div class="pronoun-cell pc-teal">${p.possessive}</div>
+  `).join('');
+  el.innerHTML = `
+    <div class="pronoun-overview">
+      <div class="q-category cat-lavender">Osobní zájmena — přehled</div>
+      <div class="pronoun-grid">
+        <div class="pronoun-header ph-pink">Subject</div>
+        <div class="pronoun-header ph-lavender">Object</div>
+        <div class="pronoun-header ph-teal">Possessive</div>
+        ${rows}
+      </div>
+      <div style="font-size:0.85rem;color:#9B7EB5;font-weight:700;margin-top:0.8rem">
+        💡 Příklad: <em>I</em> love English. She likes <em>me</em>. This is <em>my</em> book.
+      </div>
+    </div>
+    <button class="switch-mode-btn" onclick="renderPronounsFill(0,0)">Procvičit doplňování → ✏️</button>
+  `;
+}
+
+function renderPronounsFill(current, score) {
+  const el = document.getElementById('tab-pronouns');
+  if (current >= pronounFill.length) {
+    const pct = Math.round(score / pronounFill.length * 100);
+    const emoji = pct === 100 ? '🏆' : pct >= 70 ? '🎉' : '💪';
+    el.innerHTML = `<div class="score-screen">
+      <div class="score-emoji">${emoji}</div>
+      <div class="score-title">Hotovo!</div>
+      <div class="score-number">${score}/${pronounFill.length}</div>
+      <div class="score-msg">${pct === 100 ? 'Perfektní! Zájmena zvládáš!' : 'Zkus to znovu!'}</div>
+      <button class="btn-restart" onclick="renderPronounsTable()" style="margin-right:10px;background:linear-gradient(135deg,#A78BFF,#C9B3FF)">← Přehled</button>
+      <button class="btn-restart" onclick="renderPronounsFill(0,0)" style="margin-top:10px">Znovu 🔄</button>
+    </div>`;
+    if (pct === 100) confetti();
+    return;
+  }
+  const item = pronounFill[current];
+  const pct = Math.round((current / pronounFill.length) * 100);
+  const stars = Array.from({length: pronounFill.length}, (_,i) =>
+    `<span class="score-star">${i < score ? '⭐' : '☆'}</span>`
+  ).join('');
+  const qDisplay = item.q.replace('_____', `<span class="blank">?</span>`);
+  el.innerHTML = `
+    <button class="back-btn" onclick="renderPronounsTable()">← Přehled</button>
+    <div class="progress-wrap">
+      <div class="progress-bar-bg"><div class="progress-bar-fill progress-fill-lavender" style="width:${pct}%"></div></div>
+      <div class="progress-label">${current}/${pronounFill.length}</div>
+    </div>
+    <div class="score-stars">${stars}</div>
+    <div class="question-card">
+      <div class="q-category cat-lavender">Doplň správné zájmeno</div>
+      <div class="q-text">${qDisplay}</div>
+      <div class="hint-box">💡 ${item.hint}</div>
+      <input class="fill-input" id="pronoun-input" placeholder="Napiš odpověď..." autocomplete="off" />
+      <div class="feedback" id="fb-pronouns"></div>
+    </div>
+    <button class="btn-check" id="check-pronoun" onclick="checkPronoun(${current},${score})">Zkontrolovat ✓</button>
+    <button class="btn-next btn-lavender" id="next-pronouns" onclick="renderPronounsFill(${current+1}, window._pronScore || ${score})">Další →</button>
+  `;
+  window._pronScore = score;
+  const inp = document.getElementById('pronoun-input');
+  inp.focus();
+  inp.addEventListener('keydown', e => { if (e.key === 'Enter') checkPronoun(current, score); });
+}
+
+function checkPronoun(current, score) {
+  const inp = document.getElementById('pronoun-input');
+  if (!inp || inp.disabled) return;
+  const val = inp.value.trim();
+  if (!val) return;
+  inp.disabled = true;
+  const correct = pronounFill[current].answer;
+  const fb = document.getElementById('fb-pronouns');
+  if (val.toLowerCase() === correct.toLowerCase()) {
+    window._pronScore = score + 1;
+    fb.innerHTML = '✅ Správně! Výborně!';
+    fb.className = 'feedback show ok';
+    inp.style.borderColor = 'var(--teal)';
+    inp.style.background = '#EAFAF6';
+  } else {
+    window._pronScore = score;
+    fb.innerHTML = `❌ Správná odpověď: <strong>${correct}</strong>`;
+    fb.className = 'feedback show no';
+    inp.style.borderColor = '#FF8FAF';
+  }
+  document.getElementById('check-pronoun').style.display = 'none';
+  document.getElementById('next-pronouns').classList.add('show');
+  document.getElementById('next-pronouns').setAttribute('onclick', `renderPronounsFill(${current+1}, window._pronScore)`);
+}
+
+// FLOATING STARS
+function createStars() {
+  const container = document.getElementById('stars');
+  const colors = ['#FFD95A','#FF6B9D','#C9B3FF','#00C9B1','#74C4FF'];
+  for (let i = 0; i < 18; i++) {
+    const star = document.createElement('div');
+    star.className = 'star';
+    const size = Math.random() * 8 + 4;
+    star.style.cssText = `
+      width:${size}px; height:${size}px;
+      left:${Math.random()*100}%;
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      animation-duration:${Math.random()*20+15}s;
+      animation-delay:${Math.random()*15}s;
+    `;
+    container.appendChild(star);
+  }
+}
+
+function confetti() {
+  const colors = ['#FF6B9D','#FFD95A','#C9B3FF','#00C9B1','#74C4FF','#FF9F5A'];
+  for (let i = 0; i < 40; i++) {
+    setTimeout(() => {
+      const p = document.createElement('div');
+      p.className = 'confetti-piece';
+      p.style.cssText = `
+        left:${Math.random()*100}vw;
+        top: -10px;
+        background:${colors[Math.floor(Math.random()*colors.length)]};
+        width:${Math.random()*10+6}px;
+        height:${Math.random()*10+6}px;
+        border-radius:${Math.random()>0.5?'50%':'2px'};
+        animation-duration:${Math.random()*1+1}s;
+        animation-delay:${Math.random()*0.5}s;
+      `;
+      document.body.appendChild(p);
+      setTimeout(() => p.remove(), 2000);
+    }, i * 40);
+  }
+}
+
+function showTab(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// Init
+createStars();
+initQuiz('wh', whData, 'wh');
+renderPronounsTable();
+initQuiz('be', beData, 'be');
+initQuiz('geo', geoData, 'geo');
+</script>
+</body>
+</html>
